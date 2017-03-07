@@ -186,6 +186,9 @@ int currentRMotorSpeed = rMotorDeadPos;
 int targetLMotorSpeed;
 int targetRMotorSpeed;
 
+bool trackYaw = false;
+float targetYaw;
+float targetYawMargin = 1.00f;
 
 
 void setup()
@@ -197,8 +200,11 @@ void setup()
   lMotor.attach(lMotorPWMPin);
   rMotor.attach(rMotorPWMPin);
   stopBothMotors();
-  setRightMotorSpeed(100.0);
-  setLeftMotorSpeed(100.0);
+  setRightMotorSpeed(10.0);
+  setLeftMotorSpeed(10.0);
+
+  trackYaw = true;
+  targetYaw = 0.0f;
   
   // Set up the interrupt pin, its set as active high, push-pull
   pinMode(intPin, INPUT);
@@ -278,6 +284,7 @@ void loop()
     Serial.print(", ");
     Serial.println(roll, 2);
     
+    
     blinkOn = ~blinkOn;
     count = millis(); 
 
@@ -292,6 +299,7 @@ void loop()
 
 void updateMotorState() {
   int rampStep = 10;
+  
   if (targetLMotorSpeed != currentLMotorSpeed) {
     if (targetLMotorSpeed > currentLMotorSpeed) {
       if (targetLMotorSpeed >= currentLMotorSpeed + rampStep) {
@@ -327,6 +335,45 @@ void updateMotorState() {
 
     rMotor.write(currentRMotorSpeed);
   }
+
+  if (trackYaw) {
+    float rotationAngle = targetYaw - yaw;
+    Serial.println(rotationAngle,2);
+    while (rotationAngle < -180.0f) {
+      rotationAngle += 360.0f;
+    }
+    while (rotationAngle > 180.0f) {
+      rotationAngle -= 360.0f;
+    }
+
+    if (fabs(rotationAngle) < targetYawMargin) {
+      setLeftMotorSpeed(0.0f);
+      setRightMotorSpeed(0.0f);
+    } 
+    
+    else if (rotationAngle < 0) {
+    // if we need to rotate clockwise(right)
+
+      if (targetLMotorSpeed > lMotorDeadPos - 10) {
+        targetLMotorSpeed--;
+      } else if (targetRMotorSpeed > rMotorDeadPos - 10) {
+        targetRMotorSpeed--;
+      }
+    }
+    
+    // if we need to rotate counter-clockwise(left)
+    else if (rotationAngle > 0) {
+      
+      if (targetRMotorSpeed < rMotorDeadPos + 10) {
+        targetRMotorSpeed++;
+      } else if (targetLMotorSpeed < lMotorDeadPos + 10) {
+        targetLMotorSpeed++;
+      }
+    }
+
+  }
+
+  delay(30);
     
 }
 
