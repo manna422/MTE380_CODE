@@ -145,6 +145,7 @@ float aRes, gRes; // scale resolutions per LSB for the sensors
 int intPin = 19;  // These can be changed, 2 and 3 are the Arduinos ext int pins
 #define blinkPin 13  // Blink LED on Teensy or Pro Mini when updating
 boolean blinkOn = false;
+uint32_t lastLEDUpdate = 0; // how tracking heartbeat
 
 int16_t accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
 float ax, ay, az;       // Stores the real accel value in g's
@@ -155,8 +156,6 @@ int16_t tempCount;   // Stores the real internal chip temperature in degrees Cel
 float temperature;
 float SelfTest[6];
 
-uint32_t delt_t = 0; // used to control display output rate
-uint32_t count = 0;  // used to control display output rate
 
 // parameters for 6 DoF sensor fusion calculations
 float GyroMeasError = PI * (40.0f / 180.0f);     // gyroscope measurement error in rads/s (start at 60 deg/s), then reduce after ~10 s to 3
@@ -168,7 +167,6 @@ float deltat = 0.0f;                              // integration interval for bo
 uint32_t lastUpdate = 0, firstUpdate = 0;         // used to calculate integration interval
 uint32_t Now = 0;                                 // used to calculate integration interval
 float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};            // vector to hold quaternion
-
 
 
 
@@ -256,8 +254,6 @@ void loop()
     gy = (float)gyroCount[1]*gRes;  
     gz = (float)gyroCount[2]*gRes;   
 
-    tempCount = readTempData();  // Read the x/y/z adc values
-    temperature = ((float) tempCount) / 340. + 36.53; // Temperature in degrees Centigrade
    }  
    
     Now = micros();
@@ -265,10 +261,6 @@ void loop()
     lastUpdate = Now;
 
     MadgwickQuaternionUpdate(ax, ay, az, gx*PI/180.0f, gy*PI/180.0f, gz*PI/180.0f);
-
-    // Serial print and/or display at 0.5 s rate independent of data rates
-    delt_t = millis() - count;
-    digitalWrite(blinkPin, blinkOn);
 
     yaw   = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);   
     pitch = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
@@ -284,9 +276,11 @@ void loop()
     Serial.print(", ");
     Serial.println(roll, 2);
     
-    
-    blinkOn = ~blinkOn;
-    count = millis(); 
+    if (Now/1000 - lastLEDUpdate > 1000) {
+      blinkOn = !blinkOn;
+      digitalWrite(blinkPin, blinkOn);
+      lastLEDUpdate = Now/1000;
+    }
 
     updateMotorState();
   }
@@ -338,7 +332,6 @@ void updateMotorState() {
 
   if (trackYaw) {
     float rotationAngle = targetYaw - yaw;
-    Serial.println(rotationAngle,2);
     while (rotationAngle < -180.0f) {
       rotationAngle += 360.0f;
     }
