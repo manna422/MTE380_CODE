@@ -275,6 +275,7 @@ void loop()
     Serial.print(pitch, 2);
     Serial.print(", ");
     Serial.println(roll, 2);
+    Serial.println(blinkOn);
     
     if (Now/1000 - lastLEDUpdate > 1000) {
       blinkOn = !blinkOn;
@@ -371,19 +372,19 @@ void updateMotorState() {
 }
 
 void setLeftMotorSpeed(float speed) {
- if (speed >= 0) {
-  targetLMotorSpeed = int(map(speed, 0.0f, 100.0f, lMotorDeadPos, 0));
- } else {
-  targetLMotorSpeed = int(map(-1*speed, 0.0f, 100.0f, lMotorDeadPos, 180));
- }
+  if (speed >= 0) {
+    targetLMotorSpeed = int(map(speed, 0.0f, 100.0f, lMotorDeadPos, 0));
+  } else {
+    targetLMotorSpeed = int(map(-1*speed, 0.0f, 100.0f, lMotorDeadPos, 180));
+  }
 }
 
 void setRightMotorSpeed(float speed) {
- if (speed >= 0) {
-  targetRMotorSpeed = int(map(speed, 0.0f, 100.0f, rMotorDeadPos, 180));
- } else {
-  targetRMotorSpeed = int(map(-1*speed, 0.0f, 100.0f, rMotorDeadPos, 0));
- }
+  if (speed >= 0) {
+    targetRMotorSpeed = int(map(speed, 0.0f, 100.0f, rMotorDeadPos, 180));
+  } else {
+    targetRMotorSpeed = int(map(-1*speed, 0.0f, 100.0f, rMotorDeadPos, 0));
+  }
 }
 
 void stopBothMotors() {
