@@ -1,11 +1,11 @@
 #include "ultrasonic.h"
 
-Ultrasonic::Ultrasonic(NewPings[] sensors) 
+Ultrasonic::Ultrasonic(NewPings sensors[3]) 
     : mSensor(sensors) 
 {    
 }
 
-unsigned int Ultrasonic::getDistance(unsigned int* dFront, unsigned int* dLeft, unsigned int* dRight)
+unsigned int Ultrasonic::getDistances(unsigned int* dFront, unsigned int* dLeft, unsigned int* dRight)
 {
     *dFront = mSensors[0].convert_cm(mSensors[0].ping_median(NUM_US_SAMPLE));
     *dLeft = mSensors[1].convert_cm(mSensors[1].ping_median(NUM_US_SAMPLE));
