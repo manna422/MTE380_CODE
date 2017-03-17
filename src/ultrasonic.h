@@ -14,9 +14,11 @@ class Ultrasonic {
         ~Ultrasonic();
 
         void getDistances(unsigned int* dFront, unsigned int* dLeft, unsigned int* dRight);     
-
+        void setSampleSize(int num);
+        
     private:
         NewPing* mSensor;
+        int mSampleSize;
 };
 
 #endif
