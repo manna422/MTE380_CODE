@@ -14,7 +14,7 @@
 /*
  *  Ultrasonic Defines
  */
-#define US_MAX_DISTANCE 200 // Maximum distance (in cm) to ping.
+#define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping.
 #define US_FRONT_TRIGGER_PIN 12
 #define US_FRONT_ECHO_PIN 11
 #define US_LEFT_TRIGGER_PIN 8
@@ -23,16 +23,10 @@
 #define US_RIGHT_ECHO_PIN 5
 
 /*
- * Servo Defines
+ *  Servo Defines
  */
 #define MOTOR_LEFT_PWM_PIN 10
 #define MOTOR_RIGHT_PWM_PIN 9
-
-NewPing pings[3] = {
-    NewPing(US_FRONT_TRIGGER_PIN, US_FRONT_ECHO_PIN, US_MAX_DISTANCE),
-    NewPing(US_LEFT_TRIGGER_PIN, US_LEFT_ECHO_PIN, US_MAX_DISTANCE),
-    NewPing(US_RIGHT_TRIGGER_PIN, US_RIGHT_ECHO_PIN, US_MAX_DISTANCE)
-};
 
 /*
  *  Machine States
@@ -45,11 +39,15 @@ typedef enum {
     STATE4,
     STATE5
 } States;
-States GLOBAL_STATE = STATE0;
 
 /*
  *  Object initialization
  */
+NewPing pings[3] = {
+    NewPing(US_FRONT_TRIGGER_PIN, US_FRONT_ECHO_PIN, US_MAX_DISTANCE),
+    NewPing(US_LEFT_TRIGGER_PIN, US_LEFT_ECHO_PIN, US_MAX_DISTANCE),
+    NewPing(US_RIGHT_TRIGGER_PIN, US_RIGHT_ECHO_PIN, US_MAX_DISTANCE)
+};
 Servo lMotor;
 Servo rMotor;
 Motor motor(&lMotor, &rMotor);
@@ -57,6 +55,10 @@ Ultrasonic sonar(pings);
 MPU6050 gyroIMU;
 Madgwick filter;
 
+/*
+ *  Global Variables
+ */
+States GLOBAL_STATE = STATE0;
 unsigned int dFront, dLeft, dRight;
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
@@ -90,7 +92,7 @@ void loop()
     gyroIMU.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
     filter.updateIMU(gx*PI/180.0f,gy*PI/180.0f,gz*PI/180.0f,ax,ay,az);
     motor.update();
-    
+    Serial.println(filter.getRoll());
     switch(GLOBAL_STATE)
     {
         case STATE0:
