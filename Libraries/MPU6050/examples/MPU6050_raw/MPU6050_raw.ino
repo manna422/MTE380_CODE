@@ -35,6 +35,7 @@ THE SOFTWARE.
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
 #include "MPU6050.h"
+#include <MadgwickAHRS.h>
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -52,8 +53,6 @@ MPU6050 accelgyro;
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
 
-
-
 // uncomment "OUTPUT_READABLE_ACCELGYRO" if you want to see a tab-separated
 // list of the accel X/Y/Z and then gyro X/Y/Z values in decimal. Easy to read,
 // not so easy to parse, and slow(er) over UART.
@@ -68,6 +67,8 @@ int16_t gx, gy, gz;
 
 #define LED_PIN 13
 bool blinkState = false;
+
+Madgwick filter;
 
 void setup() {
     // join I2C bus (I2Cdev library doesn't do this automatically)
@@ -112,7 +113,7 @@ void setup() {
     Serial.print(accelgyro.getZGyroOffset()); Serial.print("\t"); // 0
     Serial.print("\n");
     */
-
+    
     // configure Arduino LED for
     pinMode(LED_PIN, OUTPUT);
 }
@@ -120,20 +121,23 @@ void setup() {
 void loop() {
     // read raw accel/gyro measurements from device
     accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-
+    filter.updateIMU(gx*PI/180.0f,gy*PI/180.0f,gz*PI/180.0f,ax,ay,az);
     // these methods (and a few others) are also available
     //accelgyro.getAcceleration(&ax, &ay, &az);
     //accelgyro.getRotation(&gx, &gy, &gz);
 
     #ifdef OUTPUT_READABLE_ACCELGYRO
         // display tab-separated accel/gyro x/y/z values
-        Serial.print("a/g:\t");
-        Serial.print(ax); Serial.print("\t");
-        Serial.print(ay); Serial.print("\t");
-        Serial.print(az); Serial.print("\t");
-        Serial.print(gx); Serial.print("\t");
-        Serial.print(gy); Serial.print("\t");
-        Serial.println(gz);
+        //Serial.print("a/g:\t");
+        //Serial.print(ax); Serial.print("\t");
+        //Serial.print(ay); Serial.print("\t");
+        //Serial.print(az); Serial.print("\t");
+        //Serial.print(gx); Serial.print("\t");
+        //Serial.print(gy); Serial.print("\t");
+        //Serial.println(gz);
+        Serial.print(filter.getRoll()); Serial.print("\t");
+        Serial.print(filter.getPitch()); Serial.print("\t");
+        Serial.println(filter.getYaw()); 
     #endif
 
     #ifdef OUTPUT_BINARY_ACCELGYRO
@@ -144,8 +148,9 @@ void loop() {
         Serial.write((uint8_t)(gy >> 8)); Serial.write((uint8_t)(gy & 0xFF));
         Serial.write((uint8_t)(gz >> 8)); Serial.write((uint8_t)(gz & 0xFF));
     #endif
-
+    
     // blink LED to indicate activity
     blinkState = !blinkState;
     digitalWrite(LED_PIN, blinkState);
 }
+
