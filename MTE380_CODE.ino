@@ -15,7 +15,7 @@
 #define US_RIGHT_ECHO_PIN 5
 
 /*
- * Servo State Variables
+ * Servo Defines
  */
 #define MOTOR_LEFT_PWM_PIN 10
 #define MOTOR_RIGHT_PWM_PIN 9
@@ -36,9 +36,13 @@ void setup()
 {
     lMotor.attach(lMotorPWMPin);
     rMotor.attach(rMotorPWMPin);
+    motor.stopBothMotors();
+    motor.setLeftMotorSpeed(10f);
+    motor.setRightMotorSpeed(10f);
 }
 
 void loop()
 {
-
+    motor.update();
+    delay(30);
 }
