@@ -12,7 +12,10 @@ class Ultrasonic {
         // front - left - right
         Ultrasonic(NewPing sensors[3]);
 
-        void getDistances(unsigned int* dFront, unsigned int* dLeft, unsigned int* dRight);     
+        unsigned int getFrontDist();
+        unsigned int getLeftDist();
+        unsigned int getRightDist();
+        void getAllDist(unsigned int* dFront, unsigned int* dLeft, unsigned int* dRight);     
         void setSampleSize(int num);
         
     private:

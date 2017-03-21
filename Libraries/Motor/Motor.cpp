@@ -5,11 +5,8 @@ Motor::Motor(Servo* left, Servo* right) {
     mLeft = left;
     mRight = right;
     rampStep = 10;
-    lMotorDeadPos = 92;
-    rMotorDeadPos = 92;
-    currentLMotorSpeed = lMotorDeadPos;
-    currentRMotorSpeed = rMotorDeadPos;
-    Motor::stopBothMotors();
+    currentLMotorSpeed = 92; //TODO verify motor stop
+    currentRMotorSpeed = 92; //TODO verify motor stop
 }
 
 void Motor::update() {
@@ -50,25 +47,12 @@ void Motor::update() {
     }
 }
 
-void Motor::setLeftMotorSpeed(float speed) {
-    if (speed >= 0) {
-        targetLMotorSpeed = int(map(speed, 0.0f, 100.0f, lMotorDeadPos, 0));
-    } else {
-        targetLMotorSpeed = int(map(-1*speed, 0.0f, 100.0f, lMotorDeadPos, 180));
-    }
+void Motor::setLeftMotorSpeed(int speed) {
+    targetLMotorSpeed = speed;
 }
 
-void Motor::setRightMotorSpeed(float speed) {
-    if (speed >= 0) {
-        targetRMotorSpeed = int(map(speed, 0.0f, 100.0f, rMotorDeadPos, 180));
-    } else {
-        targetRMotorSpeed = int(map(-1*speed, 0.0f, 100.0f, rMotorDeadPos, 0));
-    }
-}
-
-void Motor::stopBothMotors() {
-    Motor::setLeftMotorSpeed(0.0f);
-    Motor::setRightMotorSpeed(0.0f);
+void Motor::setRightMotorSpeed(int speed) {
+    targetRMotorSpeed = speed;
 }
 
 void Motor::setRampStep(int step) {

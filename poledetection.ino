@@ -11,3 +11,4 @@ void detectPole()
 
     // Stop motor when detected discrepancy.
 }
+

@@ -15,35 +15,37 @@
  *  Ultrasonic Defines
  */
 #define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping.
-#define US_FRONT_TRIGGER_PIN 12
-#define US_FRONT_ECHO_PIN 11
-#define US_LEFT_TRIGGER_PIN 8
-#define US_LEFT_ECHO_PIN 7
-#define US_RIGHT_TRIGGER_PIN 6
-#define US_RIGHT_ECHO_PIN 5
+#define US_FRONT_TRIGGER_PIN 30
+#define US_FRONT_ECHO_PIN 31
+#define US_LEFT_TRIGGER_PIN 32
+#define US_LEFT_ECHO_PIN 33
+#define US_RIGHT_TRIGGER_PIN 34
+#define US_RIGHT_ECHO_PIN 35
 
 /*
  *  Servo Defines
  */
-#define MOTOR_LEFT_PWM_PIN 10
-#define MOTOR_RIGHT_PWM_PIN 9
+#define MOTOR_LEFT_PWM_PIN 9
+#define MOTOR_RIGHT_PWM_PIN 6
 
 /*
  *  Machine States
  */
 typedef enum {
-    STATE0 = 0,
-    STATE1,
+    ST_STOP = 0,
+    ST_DRIVE_TO_WALL,
     STATE2,
     STATE3,
     STATE4,
-    STATE5
+    STATE5,
+    ST_DEBUG
 } States;
 
 /*
  *  Object initialization
  */
-NewPing pings[3] = {
+NewPing pings[3] = 
+{
     NewPing(US_FRONT_TRIGGER_PIN, US_FRONT_ECHO_PIN, US_MAX_DISTANCE),
     NewPing(US_LEFT_TRIGGER_PIN, US_LEFT_ECHO_PIN, US_MAX_DISTANCE),
     NewPing(US_RIGHT_TRIGGER_PIN, US_RIGHT_ECHO_PIN, US_MAX_DISTANCE)
@@ -58,10 +60,13 @@ Madgwick filter;
 /*
  *  Global Variables
  */
-States GLOBAL_STATE = STATE0;
-unsigned int dFront, dLeft, dRight;
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
+
+/*
+ *  Set Initial State 
+ */
+States GLOBAL_STATE = ST_DEBUG;
 
 void setup() 
 {
@@ -84,20 +89,15 @@ void setup()
     
     lMotor.attach(MOTOR_LEFT_PWM_PIN);
     rMotor.attach(MOTOR_RIGHT_PWM_PIN);
-    motor.stopBothMotors();
 }
 
 void loop()
-{
-    gyroIMU.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-    filter.updateIMU(gx*PI/180.0f,gy*PI/180.0f,gz*PI/180.0f,ax,ay,az);
-    motor.update();
-    Serial.println(filter.getRoll());
+{   
     switch(GLOBAL_STATE)
     {
-        case STATE0:
+        case ST_STOP:
             break;
-        case STATE1:
+        case ST_DRIVE_TO_WALL:
             break;
         case STATE2:
             break;
@@ -107,6 +107,17 @@ void loop()
             break;
         case STATE5:
             break;
+        case ST_DEBUG:
+          calibrateMotors();
+          break;
         default: ;    
     }
+    
 }
+
+void update() {
+    //gyroIMU.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+    //filter.updateIMU(gx*PI/180.0f,gy*PI/180.0f,gz*PI/180.0f,ax,ay,az);
+    motor.update();
+}
+

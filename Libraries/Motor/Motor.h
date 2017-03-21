@@ -8,9 +8,8 @@ class Motor {
         Motor(Servo* left, Servo* right);
 
         void update();
-        void setLeftMotorSpeed(float speed);
-        void setRightMotorSpeed(float speed);
-        void stopBothMotors(); 
+        void setLeftMotorSpeed(int speed);
+        void setRightMotorSpeed(int speed);
         void setRampStep(int step);
 
     private:
