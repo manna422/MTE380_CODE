@@ -1,4 +1,5 @@
-#include "motor.h"
+#include "Motor.h"
+#include <Arduino.h>
 
 Motor::Motor(Servo* left, Servo* right) {
     mLeft = left;
@@ -70,6 +71,6 @@ void Motor::stopBothMotors() {
     Motor::setRightMotorSpeed(0.0f);
 }
 
-void Motor::setrampStep(int step) {
+void Motor::setRampStep(int step) {
     rampStep = step;
 }

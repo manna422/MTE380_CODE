@@ -6,7 +6,6 @@
 class Motor {
     public:
         Motor(Servo* left, Servo* right);
-        ~Motor();
 
         void update();
         void setLeftMotorSpeed(float speed);

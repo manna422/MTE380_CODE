@@ -11,7 +11,6 @@ class Ultrasonic {
         // Insert US sensors in the order of 
         // front - left - right
         Ultrasonic(NewPing sensors[3]);
-        ~Ultrasonic();
 
         void getDistances(unsigned int* dFront, unsigned int* dLeft, unsigned int* dRight);     
         void setSampleSize(int num);
@@ -22,3 +21,4 @@ class Ultrasonic {
 };
 
 #endif
+    
