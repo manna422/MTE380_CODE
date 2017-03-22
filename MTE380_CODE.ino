@@ -114,6 +114,13 @@ void pinSetup()
   pinMode(SWITCH_PIN, INPUT);
   digitalWrite(SWITCH_POWER, HIGH);
 
+  pinMode(US_FRONT_GROUND, OUTPUT);
+  pinMode(US_LEFT_GROUND, OUTPUT);
+  pinMode(US_RIGHT_GROUND, OUTPUT);
+  pinMode(US_FRONT_POWER, OUTPUT);
+  pinMode(US_LEFT_POWER, OUTPUT);
+  pinMode(US_RIGHT_POWER, OUTPUT);
+
   digitalWrite(US_FRONT_GROUND, LOW);
   digitalWrite(US_LEFT_GROUND, LOW);
   digitalWrite(US_RIGHT_GROUND, LOW);
