@@ -8,11 +8,11 @@
 /*
  *  Pin Definitions 
  */
-#define US_FRONT_POWER 23
-#define US_FRONT_GROUND 29
+#define US_FRONT_POWER 29
+#define US_FRONT_GROUND 23
 #define US_FRONT_TRIGGER_PIN 25
 #define US_FRONT_ECHO_PIN 27
-#define US_LEFT_POWER 27
+#define US_LEFT_POWER 37
 #define US_LEFT_GROUND 31
 #define US_LEFT_TRIGGER_PIN 35
 #define US_LEFT_ECHO_PIN 33
