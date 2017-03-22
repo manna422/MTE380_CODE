@@ -15,12 +15,26 @@
  *  Ultrasonic Defines
  */
 #define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping.
-#define US_FRONT_TRIGGER_PIN 30
-#define US_FRONT_ECHO_PIN 31
-#define US_LEFT_TRIGGER_PIN 32
+
+#define US_FRONT_POWER 23
+#define US_FRONT_GROUND 29
+#define US_FRONT_TRIGGER_PIN 25
+#define US_FRONT_ECHO_PIN 27
+
+#define US_LEFT_POWER 27
+#define US_LEFT_GROUND 31
+#define US_LEFT_TRIGGER_PIN 35
 #define US_LEFT_ECHO_PIN 33
-#define US_RIGHT_TRIGGER_PIN 34
-#define US_RIGHT_ECHO_PIN 35
+
+#define US_RIGHT_POWER 28
+#define US_RIGHT_GROUND 22
+#define US_RIGHT_TRIGGER_PIN 26
+#define US_RIGHT_ECHO_PIN 24
+
+#define US_NUM_SAMPLE 5
+#define CM_WALL_TO_RAMP 34
+#define CM_POLE_TO_WALL 19
+#define DETECT_TOLERANCE 3
 
 /*
  *  Servo Defines
@@ -74,8 +88,22 @@ int switchReading;
  */
 States GLOBAL_STATE = ST_DEBUG;
 
+void initPins()
+{
+    pinMode(switchPin, INPUT);
+    digitalWrite(switchHigh, HIGH);
+    digitalWrite(US_FRONT_POWER, HIGH);
+    digitalWrite(US_LEFT_POWER, HIGH);
+    digitalWrite(US_RIGHT_POWER, HIGH);
+    digitalWrite(US_FRONT_GROUND, LOW);
+    digitalWrite(US_LEFT_GROUND, LOW);
+    digitalWrite(US_RIGHT_GROUND, LOW);
+}
+
 void setup() 
 {
+    initPins();
+
     Wire.begin();
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega328P__)
     // deactivate internal pull-ups for twi
@@ -89,10 +117,7 @@ void setup()
     cbi(PORTD, 1);
 #endif
     Serial.begin(38400);
-    
-    pinMode(switchPin, INPUT);
-    digitalWrite(switchHigh, HIGH);
-    
+    sonar.setSampleSize(US_NUM_SAMPLE);
     gyroIMU.initialize();
     filter.begin(25);
     
@@ -127,10 +152,10 @@ void loop()
 }
 
 void update() {
-    //gyroIMU.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-    //filter.updateIMU(gx*PI/180.0f,gy*PI/180.0f,gz*PI/180.0f,ax,ay,az);
+    gyroIMU.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+    filter.updateIMU(gx*PI/180.0f,gy*PI/180.0f,gz*PI/180.0f,ax,ay,az);
     motor.update();
-    printSpeed();
+    printIMU();
     
     switchReading = digitalRead(switchPin);
     if (switchReading == HIGH)
@@ -139,9 +164,9 @@ void update() {
         GLOBAL_STATE = ST_DEBUG;
 }
 
-void printSpeed() {
-    Serial.print(motor.getLTargetSpeed()); Serial.print("\t");
-    Serial.print(motor.getRTargetSpeed()); Serial.print("\t");
-    Serial.print(motor.getLCurrentSpeed()); Serial.print("\t");
-    Serial.println(motor.getRCurrentSpeed());
+void printIMU() {
+    Serial.print(filter.getRoll()); Serial.print("\t");
+    Serial.print(filter.getPitch()); Serial.print("\t");
+    Serial.println(filter.getYaw()); 
 }
+
