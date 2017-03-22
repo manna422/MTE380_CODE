@@ -1,8 +1,8 @@
 typedef enum 
 {
     L_STOP = 92,
-    L_FWD_SLOW = 85,
-    L_FWD_50,
+    L_FWD_SLOW = 84,
+    L_FWD_50 = 50,
     L_FWD_75,
     L_FWD_MAX = 10,
     L_REV_25,
@@ -15,7 +15,7 @@ typedef enum
 {
     R_STOP = 92,
     R_FWD_SLOW = 100,
-    R_FWD_50,
+    R_FWD_50 = 120,
     R_FWD_75,
     R_FWD_MAX = 141,
     R_REV_25,
@@ -26,8 +26,8 @@ typedef enum
 
 void calibrateMotors()
 {
-    motor.setLeftMotorSpeed(L_FWD_SLOW);
-    motor.setRightMotorSpeed(R_FWD_SLOW);
+    motor.setLeftMotorSpeed(L_FWD_MAX);
+    motor.setRightMotorSpeed(R_FWD_MAX);
     while(switchReading == LOW) {
         delay(30);
         update();

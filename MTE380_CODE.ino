@@ -132,7 +132,7 @@ void update() {
     motor.update();
     printSpeed();
     
-    switchReading = digitalRead(switchPin);}
+    switchReading = digitalRead(switchPin);
     if (switchReading == HIGH)
         GLOBAL_STATE = ST_STOP;
     else
@@ -141,5 +141,7 @@ void update() {
 
 void printSpeed() {
     Serial.print(motor.getLTargetSpeed()); Serial.print("\t");
-    Serial.println(motor.getrTargetSpeed());
+    Serial.print(motor.getRTargetSpeed()); Serial.print("\t");
+    Serial.print(motor.getLCurrentSpeed()); Serial.print("\t");
+    Serial.println(motor.getRCurrentSpeed());
 }
