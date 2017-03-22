@@ -34,6 +34,8 @@ void imuUpdate()
   roll  *= 180.0f / PI;
 
 #if defined(DEBUG_PRINT)
+  Serial.print(GLOBAL_STATE);
+  Serial.print("   ");
   Serial.print(roll, 2);
   Serial.print(", ");
   Serial.print(pitch, 2);

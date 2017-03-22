@@ -1,9 +1,9 @@
-int targetLMotorSpeed;
-int targetRMotorSpeed;
-int currentLMotorSpeed;
-int currentRMotorSpeed;
 int lMotorDeadPos = 92;
 int rMotorDeadPos = 92;
+int targetLMotorSpeed = lMotorDeadPos;
+int targetRMotorSpeed = rMotorDeadPos;
+int currentLMotorSpeed = lMotorDeadPos;
+int currentRMotorSpeed = rMotorDeadPos;
 int rampStep = 10;
 
 void setLeftMotorSpeed(int speed) {

@@ -84,7 +84,8 @@ typedef enum {
     ST_DRIVE_TO_WALL,
     ST_UP_WALL,
     ST_TOP_WALL,
-    ST_DOWN_WALL,
+    ST_DOWN_WALL_1,
+    ST_DOWN_WALL_2,
     ST_POLE_DETECT,
     ST_DEBUG
 } States;
@@ -93,8 +94,10 @@ typedef enum {
  *  Global Variables
  */
 int switchReading;
-States INITIAL_STATE = ST_DEBUG;
+States INITIAL_STATE = ST_DRIVE_TO_WALL;
 States GLOBAL_STATE = INITIAL_STATE;
+unsigned long STATE_START_TIME = 0;
+
 
 /*
  *  Helper Functions
@@ -108,15 +111,17 @@ void pinSetup()
   pinMode(SWITCH_PIN, INPUT);
   digitalWrite(SWITCH_POWER, HIGH);
 
-  digitalWrite(US_FRONT_POWER, HIGH);
-  digitalWrite(US_LEFT_POWER, HIGH);
-  digitalWrite(US_RIGHT_POWER, HIGH);
   digitalWrite(US_FRONT_GROUND, LOW);
   digitalWrite(US_LEFT_GROUND, LOW);
   digitalWrite(US_RIGHT_GROUND, LOW);
+  digitalWrite(US_FRONT_POWER, HIGH);
+  digitalWrite(US_LEFT_POWER, HIGH);
+  digitalWrite(US_RIGHT_POWER, HIGH);
 
   lMotor.attach(MOTOR_LEFT_PWM_PIN);
+  lMotor.write(L_STOP);
   rMotor.attach(MOTOR_RIGHT_PWM_PIN);
+  rMotor.write(R_STOP);
 }
 
 // Call this whenever polling occurs
@@ -137,8 +142,7 @@ void update()
 }
 
 /*
- *  Main Loop
- */
+ *  Main Loop */
 void setup()
 {
   Serial.begin(38400);
@@ -167,12 +171,19 @@ void loop()
       break;
     } 
     case ST_DRIVE_TO_WALL:
+      driveToWallState();
       break;
     case ST_UP_WALL:
+      upWallState();
       break;
     case ST_TOP_WALL:
+      topWallState();
       break;
-    case ST_DOWN_WALL:
+    case ST_DOWN_WALL_1:
+      downWall1State();
+      break;
+    case ST_DOWN_WALL_2:
+      downWall2State();
       break;
     case ST_POLE_DETECT:
       break;
