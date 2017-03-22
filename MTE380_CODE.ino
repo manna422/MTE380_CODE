@@ -76,7 +76,9 @@ Madgwick filter;
  */
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
-
+uint32_t timeNow;
+uint32_t timePrev = 0;
+float deltat = 0.0f;
 /*
  *  On/Off Switch
  */
@@ -153,7 +155,11 @@ void loop()
 
 void update() {
     gyroIMU.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-    filter.updateIMU(gx*PI/180.0f,gy*PI/180.0f,gz*PI/180.0f,ax,ay,az);
+    timeNow = micros();
+    deltat = ((timeNow - timePrev)/1000000.0f);
+    timePrev = timeNow;
+
+    filter.updateIMU(gx*PI/180.0f,gy*PI/180.0f,gz*PI/180.0f,ax,ay,az,deltat);
     motor.update();
     printIMU();
     

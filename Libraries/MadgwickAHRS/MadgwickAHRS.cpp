@@ -54,7 +54,7 @@ void Madgwick::update(float gx, float gy, float gz, float ax, float ay, float az
 
 	// Use IMU algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
 	if((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
-		updateIMU(gx, gy, gz, ax, ay, az);
+		updateIMU(gx, gy, gz, ax, ay, az, 0);
 		return;
 	}
 
@@ -150,7 +150,7 @@ void Madgwick::update(float gx, float gy, float gz, float ax, float ay, float az
 //-------------------------------------------------------------------------------------------
 // IMU algorithm update
 
-void Madgwick::updateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
+void Madgwick::updateIMU(float gx, float gy, float gz, float ax, float ay, float az, float deltaT) {
 	float recipNorm;
 	float s0, s1, s2, s3;
 	float qDot1, qDot2, qDot3, qDot4;
@@ -210,10 +210,10 @@ void Madgwick::updateIMU(float gx, float gy, float gz, float ax, float ay, float
 	}
 
 	// Integrate rate of change of quaternion to yield quaternion
-	q0 += qDot1 * invSampleFreq;
-	q1 += qDot2 * invSampleFreq;
-	q2 += qDot3 * invSampleFreq;
-	q3 += qDot4 * invSampleFreq;
+	q0 += qDot1 * deltaT;
+	q1 += qDot2 * deltaT;
+	q2 += qDot3 * deltaT;
+	q3 += qDot4 * deltaT;
 
 	// Normalise quaternion
 	recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
