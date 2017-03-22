@@ -84,6 +84,8 @@ typedef enum {
     ST_DOWN_WALL_1,
     ST_DOWN_WALL_2,
     ST_POLE_DETECT,
+    ST_TURN_TOWARD_POLE,
+    ST_DRIVE_TO_POLE,
     ST_DEBUG
 } States;
 
@@ -98,7 +100,7 @@ unsigned long STATE_START_TIME = 0;
 //Ultrasonic variables
 int leftDis_old = 1, frontDis_old = 1, rightDis_old = 1;
 int leftDis = 0, frontDis = 0, rightDis = 0;
-bool turning = false;
+float targetYaw = 0;
 
 /*
  *  Helper Functions
@@ -187,36 +189,12 @@ void loop()
       downWall2State();
       break;
     case ST_POLE_DETECT:
-      if(!turning){
-        getUSDis();
-        printAllUSDiff();
-        printAllUSValues();
-  
-        int leftDiff = leftDis - leftDis_old;
-        int rightDiff = rightDis - rightDis_old;
-  
-        if(rightDiff > -1*(CM_WALL_TO_RAMP+DETECT_TOLERANCE) && rightDiff < -1*(CM_WALL_TO_RAMP-DETECT_TOLERANCE)&& rightDis!= 0){
-          Serial.println("ramp on left");
-        }
-  
-        if(leftDiff + CM_POLE_TO_WALL < DETECT_TOLERANCE && leftDis!= 0 ){
-          //track 90 - 15/2 = 82.5deg
-          Serial.println("pole on left");
-          Serial.println(leftDiff);
-          Serial.println(-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE));
-        }
-  
-        if(rightDiff <= (-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE)) && rightDis != 0){
-          //track -(90 - 15/2) = -82.5deg
-          Serial.println("pole on right");
-          Serial.println(rightDiff);
-          Serial.println(-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE));
-        }  
-      }
-      
-      update();
-
+      poleDection();
       break;
+    case ST_TURN_TOWARD_POLE:
+      turnTowardPole();
+    case ST_DRIVE_TO_POLE:
+      driveToPole();
     case ST_DEBUG:
     {
       setLeftMotorSpeed(L_FWD_50);
