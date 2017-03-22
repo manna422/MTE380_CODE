@@ -29,7 +29,7 @@
 /*
  *  Ultrasonic 
  */
-#define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping.
+#define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping. width 7.5 x length 8.5 ft = 230x260
 #define US_NUM_SAMPLE 5
 #define CM_WALL_TO_RAMP 34
 #define CM_POLE_TO_WALL 19
@@ -67,12 +67,9 @@ typedef enum
 /*
  *  Object Initialization
  */
-NewPing pings[3] = 
-{
-    NewPing(US_FRONT_TRIGGER_PIN, US_FRONT_ECHO_PIN, US_MAX_DISTANCE),
-    NewPing(US_LEFT_TRIGGER_PIN, US_LEFT_ECHO_PIN, US_MAX_DISTANCE),
-    NewPing(US_RIGHT_TRIGGER_PIN, US_RIGHT_ECHO_PIN, US_MAX_DISTANCE)
-};
+NewPing frontUS(US_FRONT_TRIGGER_PIN, US_FRONT_ECHO_PIN, US_MAX_DISTANCE);
+NewPing leftUS(US_LEFT_TRIGGER_PIN, US_LEFT_ECHO_PIN, US_MAX_DISTANCE);
+NewPing rightUS(US_RIGHT_TRIGGER_PIN, US_RIGHT_ECHO_PIN, US_MAX_DISTANCE);
 Servo lMotor;
 Servo rMotor;
 
@@ -98,6 +95,10 @@ States INITIAL_STATE = ST_DRIVE_TO_WALL;
 States GLOBAL_STATE = INITIAL_STATE;
 unsigned long STATE_START_TIME = 0;
 
+//Ultrasonic variables
+int leftDis_old = 1, frontDis_old = 1, rightDis_old = 1;
+int leftDis = 0, frontDis = 0, rightDis = 0;
+bool turning = false;
 
 /*
  *  Helper Functions
@@ -186,6 +187,35 @@ void loop()
       downWall2State();
       break;
     case ST_POLE_DETECT:
+      if(!turning){
+        getUSDis();
+        printAllUSDiff();
+        printAllUSValues();
+  
+        int leftDiff = leftDis - leftDis_old;
+        int rightDiff = rightDis - rightDis_old;
+  
+        if(rightDiff > -1*(CM_WALL_TO_RAMP+DETECT_TOLERANCE) && rightDiff < -1*(CM_WALL_TO_RAMP-DETECT_TOLERANCE)&& rightDis!= 0){
+          Serial.println("ramp on left");
+        }
+  
+        if(leftDiff + CM_POLE_TO_WALL < DETECT_TOLERANCE && leftDis!= 0 ){
+          //track 90 - 15/2 = 82.5deg
+          Serial.println("pole on left");
+          Serial.println(leftDiff);
+          Serial.println(-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE));
+        }
+  
+        if(rightDiff <= (-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE)) && rightDis != 0){
+          //track -(90 - 15/2) = -82.5deg
+          Serial.println("pole on right");
+          Serial.println(rightDiff);
+          Serial.println(-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE));
+        }  
+      }
+      
+      update();
+
       break;
     case ST_DEBUG:
     {

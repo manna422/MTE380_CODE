@@ -12,7 +12,7 @@
 #define RIGHT_TRIGGER_PIN 34
 #define RIGHT_ECHO_PIN 35
 
-#define NUM_US_SAMPLE 5
+#define NUM_US_SAMPLE 7
 #define CM_WALL_TO_RAMP 34
 #define CM_POLE_TO_WALL 19
 #define DETECT_TOLERANCE 3
@@ -80,7 +80,7 @@ void setup() {
 
 long start = 0;
 bool turning = false;
-long diffturn = 1000;
+long diffturn = 750;
 
 void loop() {
   getUSDis();
@@ -103,7 +103,7 @@ void loop() {
   }
   
   if((rightDis - rightDis_old) <= (-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE)) && rightDis != 0){
-    //setRightMotorSpeed(0);
+    setRightMotorSpeed(0);
     start = millis();
     turning = true;
     Serial.println("pole on right");
