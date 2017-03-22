@@ -20,7 +20,7 @@ void topWallState() {
   setLeftMotorSpeed(L_FWD_SLOW);
   setRightMotorSpeed(R_FWD_SLOW);
 
-  if (pitch < -60.0f) {
+  if (pitch < -45.0f) {
     GLOBAL_STATE = ST_DOWN_WALL_1;
     STATE_START_TIME = millis();
   }
