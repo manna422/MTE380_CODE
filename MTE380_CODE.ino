@@ -159,33 +159,30 @@ void loop()
 {  
   update();
 
-  if (switchReading == LOW) 
+  switch(GLOBAL_STATE)
   {
-    switch(GLOBAL_STATE)
+    case ST_STOP: 
     {
-      case ST_STOP: 
-      {
-        stopBothMotors();
-        break;
-      } 
-      case ST_DRIVE_TO_WALL:
-        break;
-      case ST_UP_WALL:
-        break;
-      case ST_TOP_WALL:
-        break;
-      case ST_DOWN_WALL:
-        break;
-      case ST_POLE_DETECT:
-        break;
-      case ST_DEBUG:
-      {
-        setLeftMotorSpeed(L_FWD_50);
-        setRightMotorSpeed(R_FWD_50);
-        break;
-      } 
-      default: 
-        break;    
-    }
+      stopBothMotors();
+      break;
+    } 
+    case ST_DRIVE_TO_WALL:
+      break;
+    case ST_UP_WALL:
+      break;
+    case ST_TOP_WALL:
+      break;
+    case ST_DOWN_WALL:
+      break;
+    case ST_POLE_DETECT:
+      break;
+    case ST_DEBUG:
+    {
+      setLeftMotorSpeed(L_FWD_50);
+      setRightMotorSpeed(R_FWD_50);
+      break;
+    } 
+    default: 
+      break;    
   }
 }
