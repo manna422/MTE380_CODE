@@ -11,7 +11,11 @@ class Motor {
         void setLeftMotorSpeed(int speed);
         void setRightMotorSpeed(int speed);
         void setRampStep(int step);
-
+        int getLTargetSpeed();
+        int getRTargetSpeed();
+        int getLCurrentSpeed();
+        int getRCurrentSpeed();
+        
     private:
         Servo* mLeft;
         Servo* mRight;

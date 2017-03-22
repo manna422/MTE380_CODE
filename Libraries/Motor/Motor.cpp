@@ -39,7 +39,7 @@ void Motor::update() {
             if (targetRMotorSpeed <= currentRMotorSpeed - rampStep) {
                 currentRMotorSpeed -= rampStep;
             } else {
-                currentLMotorSpeed = targetLMotorSpeed;
+                currentRMotorSpeed = targetRMotorSpeed;
             }
         }
 
@@ -58,3 +58,24 @@ void Motor::setRightMotorSpeed(int speed) {
 void Motor::setRampStep(int step) {
     rampStep = step;
 }
+
+int Motor::getLTargetSpeed()
+{
+    return targetLMotorSpeed;
+}
+
+int Motor::getRTargetSpeed()
+{
+    return targetRMotorSpeed;
+}
+
+int Motor::getLCurrentSpeed()
+{
+    return currentLMotorSpeed;
+}
+
+int Motor::getRCurrentSpeed()
+{
+    return currentRMotorSpeed;
+}
+        

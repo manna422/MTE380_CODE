@@ -64,6 +64,12 @@ int16_t ax, ay, az;
 int16_t gx, gy, gz;
 
 /*
+ *  On/Off Switch
+ */
+int switchPin = 53;
+int switchHigh = 51;
+int switchReading;
+/*
  *  Set Initial State 
  */
 States GLOBAL_STATE = ST_DEBUG;
@@ -82,8 +88,11 @@ void setup()
     cbi(PORTD, 0);
     cbi(PORTD, 1);
 #endif
-
     Serial.begin(38400);
+    
+    pinMode(switchPin, INPUT);
+    digitalWrite(switchHigh, HIGH);
+    
     gyroIMU.initialize();
     filter.begin(25);
     
@@ -93,9 +102,11 @@ void setup()
 
 void loop()
 {   
+    update();  
     switch(GLOBAL_STATE)
     {
         case ST_STOP:
+            stopMotors();
             break;
         case ST_DRIVE_TO_WALL:
             break;
@@ -119,5 +130,16 @@ void update() {
     //gyroIMU.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
     //filter.updateIMU(gx*PI/180.0f,gy*PI/180.0f,gz*PI/180.0f,ax,ay,az);
     motor.update();
+    printSpeed();
+    
+    switchReading = digitalRead(switchPin);}
+    if (switchReading == HIGH)
+        GLOBAL_STATE = ST_STOP;
+    else
+        GLOBAL_STATE = ST_DEBUG;
 }
 
+void printSpeed() {
+    Serial.print(motor.getLTargetSpeed()); Serial.print("\t");
+    Serial.println(motor.getrTargetSpeed());
+}
