@@ -1,62 +1,71 @@
-#include <I2Cdev.h>
-#include <MPU6050.h>
-#include <Ultrasonic.h>
-#include <Motor.h>
 #include <NewPing.h>
 #include <Servo.h>
 #include <Wire.h>
-#include <MadgwickAHRS.h>
+#include "MPU6050.h"
 
-#ifndef cbi
-#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
-#endif
+#define DEBUG_PRINT // Enable for sensor data prints
 
 /*
- *  Ultrasonic Defines
+ *  Pin Definitions 
  */
-#define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping.
-
 #define US_FRONT_POWER 23
 #define US_FRONT_GROUND 29
 #define US_FRONT_TRIGGER_PIN 25
 #define US_FRONT_ECHO_PIN 27
-
 #define US_LEFT_POWER 27
 #define US_LEFT_GROUND 31
 #define US_LEFT_TRIGGER_PIN 35
 #define US_LEFT_ECHO_PIN 33
-
 #define US_RIGHT_POWER 28
 #define US_RIGHT_GROUND 22
 #define US_RIGHT_TRIGGER_PIN 26
 #define US_RIGHT_ECHO_PIN 24
+#define MOTOR_LEFT_PWM_PIN 9
+#define MOTOR_RIGHT_PWM_PIN 6
+#define INT_PIN 19
+#define SWITCH_PIN 53
+#define SWITCH_POWER 51
 
+/*
+ *  Ultrasonic 
+ */
+#define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping.
 #define US_NUM_SAMPLE 5
 #define CM_WALL_TO_RAMP 34
 #define CM_POLE_TO_WALL 19
 #define DETECT_TOLERANCE 3
 
 /*
- *  Servo Defines
+ *  Preset Motor Speed 
  */
-#define MOTOR_LEFT_PWM_PIN 9
-#define MOTOR_RIGHT_PWM_PIN 6
+typedef enum 
+{
+    L_STOP = 92,
+    L_FWD_SLOW = 84,
+    L_FWD_50 = 55,
+    L_FWD_75,
+    L_FWD_MAX = 10,
+    L_REV_25,
+    L_REV_50,
+    L_REV_75,
+    L_REV_100
+} LeftMotorSpeed;
+
+typedef enum 
+{
+    R_STOP = 92,
+    R_FWD_SLOW = 100,
+    R_FWD_50 = 129,
+    R_FWD_75,
+    R_FWD_MAX = 141,
+    R_REV_25,
+    R_REV_50,
+    R_REV_75,
+    R_REV_100
+} RightMotorSpeed;
 
 /*
- *  Machine States
- */
-typedef enum {
-    ST_STOP = 0,
-    ST_DRIVE_TO_WALL,
-    STATE2,
-    STATE3,
-    STATE4,
-    STATE5,
-    ST_DEBUG
-} States;
-
-/*
- *  Object initialization
+ *  Object Initialization
  */
 NewPing pings[3] = 
 {
@@ -66,113 +75,117 @@ NewPing pings[3] =
 };
 Servo lMotor;
 Servo rMotor;
-Motor motor(&lMotor, &rMotor);
-Ultrasonic sonar(pings);
-MPU6050 gyroIMU;
-Madgwick filter;
+
+/*
+ *  Machine States
+ */
+typedef enum {
+    ST_STOP = 0,
+    ST_DRIVE_TO_WALL,
+    ST_UP_WALL,
+    ST_TOP_WALL,
+    ST_DOWN_WALL,
+    ST_POLE_DETECT,
+    ST_DEBUG
+} States;
 
 /*
  *  Global Variables
  */
-int16_t ax, ay, az;
-int16_t gx, gy, gz;
-uint32_t timeNow;
-uint32_t timePrev = 0;
-float deltat = 0.0f;
-/*
- *  On/Off Switch
- */
-int switchPin = 53;
-int switchHigh = 51;
 int switchReading;
-/*
- *  Set Initial State 
- */
-States GLOBAL_STATE = ST_DEBUG;
+States INITIAL_STATE = ST_DEBUG;
+States GLOBAL_STATE = INITIAL_STATE;
 
-void initPins()
+/*
+ *  Helper Functions
+ */
+void pinSetup()
 {
-    pinMode(switchPin, INPUT);
-    digitalWrite(switchHigh, HIGH);
-    digitalWrite(US_FRONT_POWER, HIGH);
-    digitalWrite(US_LEFT_POWER, HIGH);
-    digitalWrite(US_RIGHT_POWER, HIGH);
-    digitalWrite(US_FRONT_GROUND, LOW);
-    digitalWrite(US_LEFT_GROUND, LOW);
-    digitalWrite(US_RIGHT_GROUND, LOW);
+  // Set up the interrupt pin, its set as active high, push-pull
+  pinMode(INT_PIN, INPUT);
+  digitalWrite(INT_PIN, LOW);
+
+  pinMode(SWITCH_PIN, INPUT);
+  digitalWrite(SWITCH_POWER, HIGH);
+
+  digitalWrite(US_FRONT_POWER, HIGH);
+  digitalWrite(US_LEFT_POWER, HIGH);
+  digitalWrite(US_RIGHT_POWER, HIGH);
+  digitalWrite(US_FRONT_GROUND, LOW);
+  digitalWrite(US_LEFT_GROUND, LOW);
+  digitalWrite(US_RIGHT_GROUND, LOW);
+
+  lMotor.attach(MOTOR_LEFT_PWM_PIN);
+  rMotor.attach(MOTOR_RIGHT_PWM_PIN);
 }
 
-void setup() 
+// Call this whenever polling occurs
+void update()
 {
-    initPins();
+  switchReading = digitalRead(SWITCH_PIN);
+  if (switchReading == HIGH)
+  {
+    GLOBAL_STATE = ST_STOP;
+  } else 
+  {
+    if (GLOBAL_STATE == ST_STOP)
+      GLOBAL_STATE = INITIAL_STATE;
+  }
+  
+  imuUpdate();
+  motorUpdate();
+}
 
-    Wire.begin();
+/*
+ *  Main Loop
+ */
+void setup()
+{
+  Serial.begin(38400);
+  Wire.begin();
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega328P__)
-    // deactivate internal pull-ups for twi
-    // as per note from atmega8 manual pg167
-    cbi(PORTC, 4);
-    cbi(PORTC, 5);
+  cbi(PORTC, 4);
+  cbi(PORTC, 5);
 #else
-    // deactivate internal pull-ups for twi
-    // as per note from atmega128 manual pg204
-    cbi(PORTD, 0);
-    cbi(PORTD, 1);
-#endif
-    Serial.begin(38400);
-    sonar.setSampleSize(US_NUM_SAMPLE);
-    gyroIMU.initialize();
-    filter.begin(25);
-    
-    lMotor.attach(MOTOR_LEFT_PWM_PIN);
-    rMotor.attach(MOTOR_RIGHT_PWM_PIN);
+  cbi(PORTD, 0);
+  cbi(PORTD, 1);
+#endif  
+  
+  pinSetup();
+  imuSetup();
 }
 
 void loop()
-{   
-    update();  
+{  
+  update();
+
+  if (switchReading == LOW) 
+  {
     switch(GLOBAL_STATE)
     {
-        case ST_STOP:
-            stopMotors();
-            break;
-        case ST_DRIVE_TO_WALL:
-            break;
-        case STATE2:
-            break;
-        case STATE3:
-            break;
-        case STATE4:
-            break;
-        case STATE5:
-            break;
-        case ST_DEBUG:
-          calibrateMotors();
-          break;
-        default: ;    
+      case ST_STOP: 
+      {
+        stopBothMotors();
+        break;
+      } 
+      case ST_DRIVE_TO_WALL:
+        break;
+      case ST_UP_WALL:
+        break;
+      case ST_TOP_WALL:
+        break;
+      case ST_DOWN_WALL:
+        break;
+      case ST_POLE_DETECT:
+        break;
+      case ST_DEBUG:
+      {
+        setLeftMotorSpeed(L_FWD_50);
+        setRightMotorSpeed(R_FWD_50);
+        break;
+      } 
+      default: 
+        break;    
     }
-    
+  }
 }
-
-void update() {
-    gyroIMU.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-    timeNow = micros();
-    deltat = ((timeNow - timePrev)/1000000.0f);
-    timePrev = timeNow;
-
-    filter.updateIMU(gx*PI/180.0f,gy*PI/180.0f,gz*PI/180.0f,ax,ay,az,deltat);
-    motor.update();
-    printIMU();
-    
-    switchReading = digitalRead(switchPin);
-    if (switchReading == HIGH)
-        GLOBAL_STATE = ST_STOP;
-    else
-        GLOBAL_STATE = ST_DEBUG;
-}
-
-void printIMU() {
-    Serial.print(filter.getRoll()); Serial.print("\t");
-    Serial.print(filter.getPitch()); Serial.print("\t");
-    Serial.println(filter.getYaw()); 
-}
-

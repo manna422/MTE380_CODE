@@ -1,15 +1,20 @@
-#include "Motor.h"
-#include <Arduino.h>
+int targetLMotorSpeed;
+int targetRMotorSpeed;
+int currentLMotorSpeed;
+int currentRMotorSpeed;
+int lMotorDeadPos = 92;
+int rMotorDeadPos = 92;
+int rampStep = 10;
 
-Motor::Motor(Servo* left, Servo* right) {
-    mLeft = left;
-    mRight = right;
-    rampStep = 10;
-    currentLMotorSpeed = 92; //TODO verify motor stop
-    currentRMotorSpeed = 92; //TODO verify motor stop
+void setLeftMotorSpeed(int speed) {
+    targetLMotorSpeed = speed;
 }
 
-void Motor::update() {
+void setRightMotorSpeed(int speed) {
+    targetRMotorSpeed = speed;
+}
+
+void motorUpdate() {
     if (targetLMotorSpeed != currentLMotorSpeed) {
         if (targetLMotorSpeed > currentLMotorSpeed) {
             if (targetLMotorSpeed >= currentLMotorSpeed + rampStep) {
@@ -25,7 +30,7 @@ void Motor::update() {
             }
         }
 
-        mLeft->write(currentLMotorSpeed);
+        lMotor.write(currentLMotorSpeed);
     }
 
     if (targetRMotorSpeed != currentRMotorSpeed) {
@@ -43,39 +48,12 @@ void Motor::update() {
             }
         }
 
-        mRight->write(currentRMotorSpeed);
+        rMotor.write(currentRMotorSpeed);
     }
 }
 
-void Motor::setLeftMotorSpeed(int speed) {
-    targetLMotorSpeed = speed;
-}
-
-void Motor::setRightMotorSpeed(int speed) {
-    targetRMotorSpeed = speed;
-}
-
-void Motor::setRampStep(int step) {
-    rampStep = step;
-}
-
-int Motor::getLTargetSpeed()
+void stopBothMotors()
 {
-    return targetLMotorSpeed;
+    targetLMotorSpeed = lMotorDeadPos;
+    targetRMotorSpeed = rMotorDeadPos;
 }
-
-int Motor::getRTargetSpeed()
-{
-    return targetRMotorSpeed;
-}
-
-int Motor::getLCurrentSpeed()
-{
-    return currentLMotorSpeed;
-}
-
-int Motor::getRCurrentSpeed()
-{
-    return currentRMotorSpeed;
-}
-        
