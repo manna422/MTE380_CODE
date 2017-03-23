@@ -110,6 +110,7 @@ int leftDis = 0, frontDis = 0, rightDis = 0;
 float targetYaw = 0;
 
 int backup = 0;
+float tmpYaw;
 
 /*
  *  Helper Functions
@@ -186,6 +187,7 @@ void loop()
   {
     case ST_STOP: 
     {
+      tmpYaw = yaw;
       stopBothMotors();
       break;
     } 

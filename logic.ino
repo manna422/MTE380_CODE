@@ -1,9 +1,6 @@
-float tmpYaw;
-
 void driveToWallState() {
   setLeftMotorSpeed(L_FWD_MAX);
   setRightMotorSpeed(R_FWD_MAX);
-  tmpYaw = yaw;
 
   if (pitch > 60.0f) {
     GLOBAL_STATE = ST_UP_WALL;
