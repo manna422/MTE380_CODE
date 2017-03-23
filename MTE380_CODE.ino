@@ -32,7 +32,7 @@
 #define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping. width 7.5 x length 8.5 ft = 230x260
 #define US_NUM_SAMPLE 7
 #define CM_WALL_TO_RAMP 34
-#define CM_POLE_TO_WALL 19
+#define CM_POLE_TO_WALL 49
 #define DETECT_TOLERANCE 3
 
 /*
@@ -45,10 +45,11 @@ typedef enum
     L_FWD_50 = 55,
     L_FWD_75,
     L_FWD_MAX = 10,
-    L_REV_25,
-    L_REV_50,
+    L_REV_25=106,
+    L_REV_50=135,
     L_REV_75,
-    L_REV_100 = 180
+    L_REV_100 = 180,
+    L_FWD_TEST = 0
 } LeftMotorSpeed;
 
 typedef enum 
@@ -58,10 +59,11 @@ typedef enum
     R_FWD_50 = 129,
     R_FWD_75,
     R_FWD_MAX = 141,
-    R_REV_25,
-    R_REV_50,
+    R_REV_25=80,
+    R_REV_50=46,
     R_REV_75,
-    R_REV_100 = 0
+    R_REV_100 = 0,
+    R_FWD_TEST = 180
 } RightMotorSpeed;
 
 /*
@@ -93,7 +95,7 @@ typedef enum {
  *  Global Variables
  */
 int switchReading;
-States INITIAL_STATE = ST_DOWN_WALL_2;
+States INITIAL_STATE = ST_DRIVE_TO_WALL;
 States GLOBAL_STATE = INITIAL_STATE;
 unsigned long STATE_START_TIME = 0;
 
@@ -101,6 +103,8 @@ unsigned long STATE_START_TIME = 0;
 int leftDis_old = 1, frontDis_old = 1, rightDis_old = 1;
 int leftDis = 0, frontDis = 0, rightDis = 0;
 float targetYaw = 0;
+
+int backup = 0;
 
 /*
  *  Helper Functions
@@ -206,8 +210,8 @@ void loop()
       break;
     case ST_DEBUG:
     {
-      setLeftMotorSpeed(L_FWD_50);
-      setRightMotorSpeed(R_FWD_50);
+      setLeftMotorSpeed(L_FWD_TEST);
+      setRightMotorSpeed(R_FWD_TEST);
       break;
     } 
     default: 

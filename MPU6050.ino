@@ -35,12 +35,15 @@ void imuUpdate()
 
 #if defined(DEBUG_PRINT)
   Serial.print(GLOBAL_STATE);
-  Serial.print("   ");
+  Serial.print("   Roll:");
+  printSpace(roll);
   Serial.print(roll, 2);
-  Serial.print(", ");
+  Serial.print(" Pitch:");
+  printSpace(pitch);
   Serial.print(pitch, 2);
-  Serial.print(", ");
-  Serial.println(yaw, 2);
+  Serial.print(" Yaw:");
+  printSpace(yaw);
+  Serial.print(yaw, 2);
 #endif  
 }
 
@@ -468,3 +471,10 @@ void readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * des
     dest[i++] = Wire.read(); // Put read results in the Rx buffer
   }         
 }
+
+void printSpace(float value){
+  if(value >= 0){Serial.print(" ");}
+  if(abs(value) < 10){Serial.print(" ");}
+  if(abs(value) < 100){Serial.print(" ");} 
+}
+

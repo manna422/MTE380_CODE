@@ -50,6 +50,14 @@ void motorUpdate() {
 
         rMotor.write(currentRMotorSpeed);
     }
+    
+ 
+  Serial.print(" Left Motor:");
+  printSpace(currentLMotorSpeed);
+  Serial.print(currentLMotorSpeed);
+  Serial.print(" Right Motor:");
+  printSpace(currentRMotorSpeed);
+  Serial.println(currentRMotorSpeed);
 }
 
 void stopBothMotors()
