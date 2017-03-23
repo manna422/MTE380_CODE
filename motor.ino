@@ -14,6 +14,14 @@ void setRightMotorSpeed(int speed) {
     targetRMotorSpeed = speed;
 }
 
+int getCurrentLeftMotorSpeed() {
+    return currentLMotorSpeed;
+}
+
+int getCurrentRightMotorSpeed() {
+    return currentRMotorSpeed;
+}
+
 void motorUpdate() {
     if (targetLMotorSpeed != currentLMotorSpeed) {
         if (targetLMotorSpeed > currentLMotorSpeed) {

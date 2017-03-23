@@ -88,6 +88,7 @@ typedef enum {
     ST_PRE_POLE_DETECTION_1,
     ST_PRE_POLE_DETECTION_2,
     ST_PRE_POLE_DETECTION_3,
+    ST_PRE_POLE_DETECTION_4,
     ST_POLE_DETECT,
     ST_TURN_TOWARD_POLE,
     ST_DRIVE_TO_POLE,
@@ -211,6 +212,9 @@ void loop()
       break;
     case ST_PRE_POLE_DETECTION_3:
       prePoleDetection3();
+      break;
+    case ST_PRE_POLE_DETECTION_4:
+      prePoleDetection4();
       break;
     case ST_POLE_DETECT:
       poleDection();

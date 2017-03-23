@@ -52,7 +52,7 @@ void prePoleDetection1() {
   setLeftMotorSpeed(L_FWD_MAX);
   setRightMotorSpeed(R_FWD_MAX);
 
-  if (millis() - STATE_START_TIME > 200) {
+  if (millis() - STATE_START_TIME > 300) {
     GLOBAL_STATE = ST_PRE_POLE_DETECTION_2;
   }
 }
@@ -79,7 +79,16 @@ void prePoleDetection3() {
   setLeftMotorSpeed(92);
   setRightMotorSpeed(92);
 
-  if (millis() - STATE_START_TIME > 500) {
+  if (millis() - STATE_START_TIME > 200) {
+    GLOBAL_STATE = ST_PRE_POLE_DETECTION_4;
+  }
+}
+
+void prePoleDetection4() {
+  setLeftMotorSpeed(L_FWD_50);
+  setRightMotorSpeed(R_FWD_50);
+
+  if ((getCurrentLeftMotorSpeed() == L_FWD_50) and (getCurrentRightMotorSpeed() == R_FWD_50)) {
     GLOBAL_STATE = ST_POLE_DETECT;
   }
 }
