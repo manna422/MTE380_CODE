@@ -58,7 +58,7 @@ typedef enum
     R_FWD_SLOW = 100,
     R_FWD_50 = 129,
     R_FWD_75,
-    R_FWD_MAX = 141,
+    R_FWD_MAX = 142,
     R_REV_25=80,
     R_REV_50=46,
     R_REV_75,
