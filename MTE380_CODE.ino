@@ -30,7 +30,7 @@
  *  Ultrasonic 
  */
 #define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping. width 7.5 x length 8.5 ft = 230x260
-#define US_NUM_SAMPLE 7
+#define US_NUM_SAMPLE 5
 #define CM_WALL_TO_RAMP 34
 #define CM_POLE_TO_WALL 49
 #define DETECT_TOLERANCE 3
