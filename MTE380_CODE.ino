@@ -43,7 +43,7 @@ typedef enum
     L_STOP = 92,
     L_FWD_SLOW = 84,
     L_FWD_50 = 55,
-    L_FWD_75,
+    L_FWD_75 = 27,
     L_FWD_MAX = 0,
     L_REV_25=106,
     L_REV_50=135,
@@ -57,8 +57,8 @@ typedef enum
     R_STOP = 92,
     R_FWD_SLOW = 100,
     R_FWD_50 = 129,
-    R_FWD_75,
-    R_FWD_MAX = 143,
+    R_FWD_75 = 136,
+    R_FWD_MAX = 142,
     R_REV_25=80,
     R_REV_50=46,
     R_REV_75,
@@ -92,6 +92,7 @@ typedef enum {
     ST_POLE_DETECT,
     ST_TURN_TOWARD_POLE,
     ST_DRIVE_TO_POLE,
+    ST_FINISH,
     ST_DEBUG
 } States;
 
@@ -99,7 +100,7 @@ typedef enum {
  *  Global Variables
  */
 int switchReading;
-// States INITIAL_STATE = ST_POLE_DETECT;
+//States INITIAL_STATE = ST_PRE_POLE_DETECTION_4;
 States INITIAL_STATE = ST_DRIVE_TO_WALL;
 States GLOBAL_STATE = INITIAL_STATE;
 unsigned long STATE_START_TIME = 0;
@@ -107,10 +108,13 @@ unsigned long STATE_START_TIME = 0;
 //Ultrasonic variables
 int leftDis_old = 1, frontDis_old = 1, rightDis_old = 1;
 int leftDis = 0, frontDis = 0, rightDis = 0;
-float targetYaw = 0;
 
-int backup = 0;
+//Driving logic variables
+float targetYaw = 0;
 float tmpYaw;
+float startingPitch = 0;
+long endingTime;
+int distToPole = 20;
 
 /*
  *  Helper Functions
@@ -226,6 +230,9 @@ void loop()
       break;
     case ST_DRIVE_TO_POLE:
       driveToPole();
+      break;
+    case ST_FINISH:
+      stopRobot();
       break;
     case ST_DEBUG:
     {
