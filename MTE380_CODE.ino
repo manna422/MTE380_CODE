@@ -85,6 +85,9 @@ typedef enum {
     ST_TOP_WALL,
     ST_DOWN_WALL_1,
     ST_DOWN_WALL_2,
+    ST_PRE_POLE_DETECTION_1,
+    ST_PRE_POLE_DETECTION_2,
+    ST_PRE_POLE_DETECTION_3,
     ST_POLE_DETECT,
     ST_TURN_TOWARD_POLE,
     ST_DRIVE_TO_POLE,
@@ -95,6 +98,7 @@ typedef enum {
  *  Global Variables
  */
 int switchReading;
+// States INITIAL_STATE = ST_POLE_DETECT;
 States INITIAL_STATE = ST_DRIVE_TO_WALL;
 States GLOBAL_STATE = INITIAL_STATE;
 unsigned long STATE_START_TIME = 0;
@@ -198,6 +202,15 @@ void loop()
       break;
     case ST_DOWN_WALL_2:
       downWall2State();
+      break;
+    case ST_PRE_POLE_DETECTION_1:
+      prePoleDetection1();
+      break;
+    case ST_PRE_POLE_DETECTION_2:
+      prePoleDetection2();
+      break;
+    case ST_PRE_POLE_DETECTION_3:
+      prePoleDetection3();
       break;
     case ST_POLE_DETECT:
       poleDection();
