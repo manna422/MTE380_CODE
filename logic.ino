@@ -45,6 +45,8 @@ void downWall2State() {
 }
 
 void poleDection(){
+  setLeftMotorSpeed(L_FWD_50);
+  setRightMotorSpeed(R_FWD_50);
   getUSDis();
   printAllUSDiff();
   printAllUSValues();
@@ -58,8 +60,11 @@ void poleDection(){
   
   if(leftDiff + CM_POLE_TO_WALL < DETECT_TOLERANCE && leftDis!= 0 ){
     //track 90 - 15/2 = 82.5deg
-    targetYaw = yaw + 82.5f;
+    targetYaw = yaw + 90.0f;
     GLOBAL_STATE = ST_TURN_TOWARD_POLE;
+    setLeftMotorSpeed(L_REV_100);
+    setRightMotorSpeed(R_REV_100);
+    getUSDis();
     Serial.println("pole on left");
     Serial.println(leftDiff);
     Serial.println(-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE));
@@ -67,36 +72,72 @@ void poleDection(){
   
   if(rightDiff <= (-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE)) && rightDis != 0){
     //track -(90 - 15/2) = -82.5deg
-    targetYaw = yaw - 82.5f;
+    targetYaw = yaw - 90.0f;
     GLOBAL_STATE = ST_TURN_TOWARD_POLE;
+    setLeftMotorSpeed(L_REV_100);
+    setRightMotorSpeed(R_REV_100);
+    getUSDis();
     Serial.println("pole on right");
     Serial.println(rightDiff);
     Serial.println(-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE));
-  }  
+  }
+
+  if(targetYaw > 180)
+    targetYaw -= 360.0f; 
+  if(targetYaw < -180)
+    targetYaw += 360.0f; 
+     
 }
 
 void turnTowardPole(){
-  float diff = targetYaw - yaw;
-  Serial.print("targetYaw = ");
-  Serial.print(targetYaw);
-  Serial.print("  yaw = ");
-  Serial.println(yaw);
-  if(abs(diff)< 2){
+  float diff = yawDiff();
+  if(abs(diff)< 2.0f){
     setLeftMotorSpeed(L_STOP);
     setRightMotorSpeed(R_STOP);
     GLOBAL_STATE = ST_DRIVE_TO_POLE;
   }
   else if(targetYaw > yaw){
-    setLeftMotorSpeed(L_STOP);
+    Serial.print("    Turning left");
+    setLeftMotorSpeed(L_REV_100);
     setRightMotorSpeed(R_FWD_MAX);
+    if(abs(diff)<40){
+      setLeftMotorSpeed(L_STOP);
+      setRightMotorSpeed(R_FWD_SLOW);  
+    }
   }
   else{
+    Serial.print("    Turning Right");
     setLeftMotorSpeed(L_FWD_MAX);
-    setRightMotorSpeed(R_STOP);
+    setRightMotorSpeed(R_REV_100);
+    if(abs(diff)<40){
+      setLeftMotorSpeed(L_FWD_SLOW);
+      setRightMotorSpeed(R_STOP);  
+    }
   }
+  Serial.println();
 }
 
 void driveToPole(){
-  setLeftMotorSpeed(L_FWD_MAX);
-  setRightMotorSpeed(R_FWD_MAX);
+  float diff = yawDiff();
+  if(abs(diff)< 2.0f){
+//    setLeftMotorSpeed(L_STOP);
+//    setRightMotorSpeed(R_STOP);
+    setLeftMotorSpeed(L_FWD_MAX);
+    setRightMotorSpeed(R_FWD_MAX);
+  }
+  else{
+    GLOBAL_STATE = ST_TURN_TOWARD_POLE;
+  }
 }
+
+float yawDiff(){
+  float diff = targetYaw - yaw;
+  Serial.print("targetYaw = ");
+  Serial.print(targetYaw);
+  Serial.print("  yaw = ");
+  Serial.print(yaw);
+  Serial.print("  difference in yaw = ");
+  Serial.println(diff);
+  return diff;
+}
+

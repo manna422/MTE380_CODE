@@ -30,7 +30,7 @@
  *  Ultrasonic 
  */
 #define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping. width 7.5 x length 8.5 ft = 230x260
-#define US_NUM_SAMPLE 5
+#define US_NUM_SAMPLE 7
 #define CM_WALL_TO_RAMP 34
 #define CM_POLE_TO_WALL 19
 #define DETECT_TOLERANCE 3
@@ -48,7 +48,7 @@ typedef enum
     L_REV_25,
     L_REV_50,
     L_REV_75,
-    L_REV_100
+    L_REV_100 = 180
 } LeftMotorSpeed;
 
 typedef enum 
@@ -61,7 +61,7 @@ typedef enum
     R_REV_25,
     R_REV_50,
     R_REV_75,
-    R_REV_100
+    R_REV_100 = 0
 } RightMotorSpeed;
 
 /*
@@ -93,7 +93,7 @@ typedef enum {
  *  Global Variables
  */
 int switchReading;
-States INITIAL_STATE = ST_DRIVE_TO_WALL;
+States INITIAL_STATE = ST_DOWN_WALL_2;
 States GLOBAL_STATE = INITIAL_STATE;
 unsigned long STATE_START_TIME = 0;
 
@@ -200,8 +200,10 @@ void loop()
       break;
     case ST_TURN_TOWARD_POLE:
       turnTowardPole();
+      break;
     case ST_DRIVE_TO_POLE:
       driveToPole();
+      break;
     case ST_DEBUG:
     {
       setLeftMotorSpeed(L_FWD_50);
