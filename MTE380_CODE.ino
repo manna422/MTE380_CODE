@@ -43,7 +43,7 @@
 typedef enum 
 {
     L_STOP = 92,
-    L_FWD_SLOW = 84,
+    L_FWD_SLOW = 85,
     L_FWD_50 = 55,
     L_FWD_75 = 27,
     L_FWD_MAX = 0,
@@ -102,8 +102,9 @@ typedef enum {
  *  Global Variables
  */
 int switchReading;
-//States INITIAL_STATE = ST_PRE_POLE_DETECTION_4;
-States INITIAL_STATE = ST_DRIVE_TO_WALL;
+//
+States INITIAL_STATE = ST_PRE_POLE_DETECTION_4;
+//States INITIAL_STATE = ST_DRIVE_TO_WALL;
 States GLOBAL_STATE = INITIAL_STATE;
 unsigned long STATE_START_TIME = 0;
 
@@ -240,8 +241,8 @@ void loop()
       break;
     case ST_DEBUG:
     {
-      setLeftMotorSpeed(L_FWD_TEST);
-      setRightMotorSpeed(R_FWD_TEST);
+      setLeftMotorSpeed(L_FWD_SLOW);
+      setRightMotorSpeed(R_FWD_SLOW);
       break;
     } 
     default: 
