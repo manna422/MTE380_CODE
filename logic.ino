@@ -37,7 +37,7 @@ void downWall1State() {
 
 void downWall2State() {
   setLeftMotorSpeed(L_FWD_MAX);
-  setRightMotorSpeed(R_FWD_MAX);
+  setRightMotorSpeed(R_FWD_MAX - 10);
 
   if (pitch > -10.0f) {
     GLOBAL_STATE = ST_PRE_POLE_DETECTION_1;
@@ -182,30 +182,30 @@ void driveToPole(){
   }
 
 
-//  #if defined(DEBUG_PRINT)
-//  Serial.print("                            starting pitch: ");
-//  printSpace(startingPitch);
-//  Serial.print(startingPitch, 2);
-//  Serial.print(" Pitch:");
-//  printSpace(avePitch());
-//  Serial.print(avePitch(), 2);
-//  Serial.print(" diff:");
-//  printSpace(avePitch() - startingPitch);
-//  Serial.println(avePitch(), 2);
-//  #endif
+  #if defined(DEBUG_PRINT)
+  Serial.print("                            starting pitch: ");
+  printSpace(startingPitch);
+  Serial.print(startingPitch, 2);
+  Serial.print(" Pitch:");
+  printSpace(avePitch());
+  Serial.print(avePitch(), 2);
+  Serial.print(" diff:");
+  printSpace(avePitch() - startingPitch);
+  Serial.println(avePitch(), 2);
+  #endif
   
-//  if(avePitch() - startingPitch > 5.0f){
-//    endingTime = millis() + 2000;
-//  }
+  if(avePitch() - startingPitch > 8.0f){
+    endingTime = millis() + 3000;
+  }
 
-//  if(millis() > endingTime){
-//    GLOBAL_STATE = ST_FINISH;
-//  }
-//  if(endingTime - millis() < 1500){
-//    setLeftMotorSpeed(L_REV_25);
-//    setRightMotorSpeed(180);
-//  }
-//  storePitch();
+  if(millis() > endingTime){
+    GLOBAL_STATE = ST_FINISH;
+  }
+  if(endingTime - millis() < 1500){
+    setLeftMotorSpeed(((L_REV_25+L_STOP)/2.0));
+    setRightMotorSpeed(180);
+  }
+  storePitch();
 }
 
 void stopRobot(){

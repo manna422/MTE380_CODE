@@ -60,7 +60,7 @@ typedef enum
     R_FWD_SLOW = 100,
     R_FWD_50 = 129,
     R_FWD_75 = 136,
-    R_FWD_MAX = 142,
+    R_FWD_MAX = 143,
     R_REV_25=80,
     R_REV_50=46,
     R_REV_75,
@@ -102,9 +102,9 @@ typedef enum {
  *  Global Variables
  */
 int switchReading;
-//
-States INITIAL_STATE = ST_PRE_POLE_DETECTION_4;
-//States INITIAL_STATE = ST_DRIVE_TO_WALL;
+//States INITIAL_STATE = ST_PRE_POLE_DETECTION_4;
+
+States INITIAL_STATE = ST_DRIVE_TO_WALL;
 States GLOBAL_STATE = INITIAL_STATE;
 unsigned long STATE_START_TIME = 0;
 
