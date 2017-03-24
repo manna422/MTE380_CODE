@@ -20,7 +20,7 @@ unsigned int getRightUSDist()
 }
 
 void getUSDis(){
-  getFrontUSDist();
+  // getFrontUSDist();
   getLeftUSDist();
   getRightUSDist();
 }

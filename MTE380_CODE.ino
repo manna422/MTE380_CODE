@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include "MPU6050.h"
 
-#define DEBUG_PRINT // Enable for sensor data prints
+// #define DEBUG_PRINT // Enable for sensor data prints
 
 /*
  *  Pin Definitions 
@@ -30,7 +30,7 @@
  *  Ultrasonic 
  */
 #define US_MAX_DISTANCE 300 // Maximum distance (in cm) to ping. width 7.5 x length 8.5 ft = 230x260
-#define US_NUM_SAMPLE 5
+#define US_NUM_SAMPLE 7
 #define CM_WALL_TO_RAMP 34
 #define CM_POLE_TO_WALL 49
 #define DETECT_TOLERANCE 3
@@ -58,7 +58,7 @@ typedef enum
 {
     R_STOP = 92,
     R_FWD_SLOW = 100,
-    R_FWD_50 = 129,
+    R_FWD_50 = 131,
     R_FWD_75 = 136,
     R_FWD_MAX = 143,
     R_REV_25=80,
