@@ -35,6 +35,8 @@
 #define CM_POLE_TO_WALL 49
 #define DETECT_TOLERANCE 3
 
+#define NUM_PITCH_SAMPLE 5
+
 /*
  *  Preset Motor Speed 
  */
@@ -115,6 +117,8 @@ float tmpYaw;
 float startingPitch = 0;
 long endingTime;
 int distToPole = 20;
+float prePitch[NUM_PITCH_SAMPLE];
+int prePitchIndex = 0;
 
 /*
  *  Helper Functions

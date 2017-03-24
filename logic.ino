@@ -157,9 +157,10 @@ void turnTowardPole(){
     setLeftMotorSpeed(L_STOP);
     setRightMotorSpeed(R_STOP);
     GLOBAL_STATE = ST_DRIVE_TO_POLE;
-    startingPitch = pitch;
-    endingTime = distToPole*1000/20+millis() + 3000;
+    startingPitch = avePitch();
+    endingTime = distToPole*1000/16+millis() + 3000;
   }
+  storePitch();
 }
 
 void driveToPole(){
@@ -185,14 +186,14 @@ void driveToPole(){
   printSpace(startingPitch);
   Serial.print(startingPitch, 2);
   Serial.print(" Pitch:");
-  printSpace(pitch);
-  Serial.print(pitch, 2);
+  printSpace(avePitch());
+  Serial.print(avePitch(), 2);
   Serial.print(" diff:");
-  printSpace(pitch - startingPitch);
-  Serial.println(pitch, 2);
+  printSpace(avePitch() - startingPitch);
+  Serial.println(avePitch(), 2);
   #endif
   
-  if(pitch - startingPitch > 10.0f){
+  if(avePitch() - startingPitch > 5.0f){
     endingTime = millis() + 2000;
   }
 
@@ -203,11 +204,16 @@ void driveToPole(){
     setLeftMotorSpeed(L_REV_25);
     setRightMotorSpeed(180);
   }
+  storePitch();
 }
 
 void stopRobot(){
   setLeftMotorSpeed(L_STOP);
   setRightMotorSpeed(R_STOP);
+  Serial.print("                                                                                     ");
+  printSpace(avePitch());
+  Serial.println(avePitch(), 2);
+  storePitch();
 }
 
 float yawDiff(){
@@ -224,3 +230,18 @@ float yawDiff(){
   
   return diff;
 }
+float avePitch(){
+  float sum= 0;
+  for(int i = 0; i < NUM_PITCH_SAMPLE; i++){
+    sum+= prePitch[i];
+  }
+  return (sum+pitch)/(NUM_PITCH_SAMPLE+1);
+}
+
+void storePitch(){
+  prePitchIndex++;
+  if(prePitchIndex>=NUM_PITCH_SAMPLE)
+    prePitchIndex = 0;
+  prePitch[prePitchIndex] = pitch;
+}
+
