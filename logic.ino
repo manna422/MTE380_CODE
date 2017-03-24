@@ -109,7 +109,7 @@ void poleDection(){
 
   if(leftDiff + CM_POLE_TO_WALL < DETECT_TOLERANCE && leftDis!= 0 ){
     //track 90 - 15/2 = 82.5deg
-    targetYaw = yaw + 82.5f;
+    targetYaw = yaw + 102.5f;
     distToPole = leftDis;
     GLOBAL_STATE = ST_TURN_TOWARD_POLE;
     Serial.println("pole on left");
@@ -119,7 +119,7 @@ void poleDection(){
 
   if(rightDiff <= (-1*(CM_POLE_TO_WALL-DETECT_TOLERANCE)) && rightDis != 0){
     //track -(90 - 15/2) = -82.5deg
-    targetYaw = yaw - 82.5f;
+    targetYaw = yaw - 102.5f;
     distToPole = rightDis;
     GLOBAL_STATE = ST_TURN_TOWARD_POLE;
     Serial.println("pole on right");
@@ -194,15 +194,19 @@ void driveToPole(){
   Serial.println(avePitch(), 2);
   #endif
   
-  if(avePitch() - startingPitch > 8.0f){
-    endingTime = millis() + 3000;
-  }
+  // if(avePitch() - startingPitch > 8.0f){
+  //   endingTime = millis() + 3000;
+  // }
 
   if(millis() > endingTime){
     GLOBAL_STATE = ST_FINISH;
   }
   if(endingTime - millis() < 1500){
     setLeftMotorSpeed(((L_REV_25+L_STOP)/2.0));
+    setRightMotorSpeed(180);
+  }
+  if(endingTime - millis() < 750){
+    setLeftMotorSpeed(0);
     setRightMotorSpeed(180);
   }
   storePitch();
